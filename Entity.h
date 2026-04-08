@@ -21,4 +21,4 @@ public:
     {
         return hp > 0;
     }
-}; 
+};
