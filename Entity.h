@@ -15,6 +15,16 @@ protected:
     int de;
 
 public:
+
+    Entity(string pname, int phpmax, int php, int pat, int pde)
+    {
+        name = pname;
+        hpMax = phpmax;
+        hp = php;
+        at = pat;
+        de = pde;
+    }
+    
     virtual void takeDamage(int amount)
     {
         hp -= (amount - de);
@@ -27,5 +37,10 @@ public:
     bool islandAlive()
     {
         return hp > 0;
+    }
+
+    string getName()
+    {
+        return name;
     }
 };

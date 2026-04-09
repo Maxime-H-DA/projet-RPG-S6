@@ -5,13 +5,24 @@ using namespace std;
 
 class Item
 {
-public:
-    string name;
-    int healAmount;
+    private:
+        string name;
+        int healAmount;
+    public:
 
-    Item(string itemName, int amount)
-    {
-        name = itemName;
-        healAmount = amount;
-    }
+        Item(string itemName, int amount)
+        {
+            name = itemName;
+            healAmount = amount;
+        }
+        
+        string getName()
+        {
+            return name;
+        }
+
+        int getHealAmount()
+        {
+            return healAmount;
+        }
 };
