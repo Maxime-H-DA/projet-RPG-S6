@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -7,22 +8,41 @@ class Item
 {
     private:
         string name;
-        int healAmount;
-    public:
+        string type;
+        int quantity;
+        int value;
 
-        Item(string itemName, int amount)
+    public:
+        Item(string itemName, string itemType, int itemValue, int itemQuantity)
         {
             name = itemName;
-            healAmount = amount;
+            type = itemType;
+            value = itemValue;
+            quantity = itemQuantity;
         }
-        
+
         string getName()
         {
             return name;
         }
 
-        int getHealAmount()
+        string getType()
         {
-            return healAmount;
+            return type;
+        }
+
+        int getValue()
+        {
+            return value;
+        }
+
+        int getQuantity()
+        {
+            return quantity;
+        }
+
+        void setQuantity(int q)
+        {
+            quantity = q;
         }
 };

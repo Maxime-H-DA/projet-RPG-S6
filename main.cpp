@@ -4,6 +4,7 @@
 #include "Monster.h"
 #include "Item.h"
 #include "GameManager.h"
+#include "Boss.h"
 
 using namespace std;
 
@@ -11,7 +12,7 @@ void runTests()
 {
     Player testPlayer("Hero");
     
-    if (testPlayer.islandAlive())
+    if (testPlayer.isAlive())
     {
         cout << "Test 1: Player initialement vivant - OK" << endl;
     }
@@ -19,24 +20,25 @@ void runTests()
     testPlayer.takeDamage(20);
     cout << "Test 2: Reception de degats (20) - OK" << endl;
 
-    Item* potion = new Item("Petite Potion", 20);
+    Item* potion = new Item("Petite Potion", "HEAL", 20, 1);
     testPlayer.addItem(potion);
-    testPlayer.useHealItem(0);
+    testPlayer.useItem(0); 
     cout << "Test 3: Ajout et utilisation objet soin - OK" << endl;
 
-    Monster* boss = new Monster("Dragon", 200, 30, 10, 50);
-    GameManager gm(&testPlayer, boss);
-    gm.announceBattle();
-    gm.processTurn();
-    cout << "Test 4: GameManager et interaction combat - OK" << endl;
+    Monster* boss = new Boss("Dragon", 200, 30, 10, 100);
+    GameManager gm(&testPlayer);
+    
+    gm.announceBattle(boss);
+    
+    testPlayer.attack(boss);
+    cout << "Test 4: Interaction combat (Attaque Player -> Monster) - OK" << endl;
 
     testPlayer.takeDamage(200);
-    if (!testPlayer.islandAlive())
+    if (!testPlayer.isAlive())
     {
         cout << "Test 5: Mort du joueur apres degats massifs - OK" << endl;
     }
 
-    delete potion;
     delete boss;
 
     cout << "--- Tous les tests sont termines avec succes ---" << endl;
