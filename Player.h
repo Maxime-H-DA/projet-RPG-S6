@@ -27,8 +27,15 @@ public:
     {
         if (index >= 0 && index < inventory.size())
         {
-            hp += inventory[index]->getHealAmount();
-            if (hp > hpMax) hp = hpMax;
+            Item* item = inventory[index];
+            if (item->getType() == "HEAL")
+            {
+                hp += item->getValue();
+            }
+            if (hp > hpMax) 
+            {
+                hp = hpMax;
+            }
             inventory.erase(inventory.begin() + index);
         }
     }

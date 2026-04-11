@@ -33,6 +33,9 @@ void runTests()
     testPlayer.attack(boss);
     cout << "Test 4: Interaction combat (Attaque Player -> Monster) - OK" << endl;
 
+    cout << "Test 6: Tentative de lecture de items.csv..." << endl;
+    gm.loadItems("items.csv");
+
     testPlayer.takeDamage(200);
     if (!testPlayer.isAlive())
     {

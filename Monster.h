@@ -30,8 +30,14 @@ public:
     void updateMercy(int amount)
     {
         mercyGauge += amount;
-        if (mercyGauge < 0) mercyGauge = 0;
-        if (mercyGauge > mercyGoal) mercyGauge = mercyGoal;
+        if (mercyGauge < 0) 
+        {
+            mercyGauge = 0;
+        }
+        if (mercyGauge > mercyGoal) 
+        {
+            mercyGauge = mercyGoal;
+        }
     }
 
     void attack(Player* target)

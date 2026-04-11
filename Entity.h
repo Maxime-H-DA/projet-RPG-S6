@@ -15,7 +15,6 @@ class Entity
         int de;
 
     public:
-
         Entity(string pname, int phpmax, int php, int pat, int pde)
         {
             name = pname;
