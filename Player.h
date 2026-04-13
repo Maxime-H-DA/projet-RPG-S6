@@ -9,44 +9,44 @@ using namespace std;
 
 class Player : public Entity
 {
-private:
-    vector<Item*> inventory;
-    int monstersSpared;
-    int totalVictories;
-    int monstersKilled;
+    private:
+        vector<Item*> inventory;
+        int monstersSpared;
+        int totalVictories;
+        int monstersKilled;
 
-public:
-    Player(string playerName) : Entity(playerName, 100, 100, 10, 5)
-    {
-        monstersSpared = 0;
-        totalVictories = 0;
-        monstersKilled = 0;
-    }
-
-    void useItem(int index)
-    {
-        if (index >= 0 && index < inventory.size())
+    public:
+        Player(string playerName) : Entity(playerName, 100, 100, 10, 5)
         {
-            Item* item = inventory[index];
-            if (item->getType() == "HEAL")
-            {
-                hp += item->getValue();
-            }
-            if (hp > hpMax) 
-            {
-                hp = hpMax;
-            }
-            inventory.erase(inventory.begin() + index);
+            monstersSpared = 0;
+            totalVictories = 0;
+            monstersKilled = 0;
         }
-    }
 
-    void attack(Entity* target)
-    {
-        target->takeDamage(at);
-    }
-    
-    void addItem(Item* item)
-    {
-        inventory.push_back(item);
-    }
+        void useItem(int index)
+        {
+            if (index >= 0 && index < inventory.size())
+            {
+                Item* item = inventory[index];
+                if (item->getType() == "HEAL")
+                {
+                    hp += item->getValue();
+                }
+                if (hp > hpMax) 
+                {
+                    hp = hpMax;
+                }
+                inventory.erase(inventory.begin() + index);
+            }
+        }
+
+        void attack(Entity* target)
+        {
+            target->takeDamage(at);
+        }
+        
+        void addItem(Item* item)
+        {
+            inventory.push_back(item);
+        }
 };
