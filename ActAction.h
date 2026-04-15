@@ -20,18 +20,18 @@ class ActAction
             mercyImpact = pImpact;
         }
 
-        string getId() 
-        { 
-            return id; 
-        }
-
-        string getText() 
-        { 
-            return text; 
-        }
-
-        int getImpact() 
+        string getId()
         {
-             return mercyImpact; 
+            return id;
+        }
+
+        string getText()
+        {
+            return text;
+        }
+
+        int getImpact()
+        {
+            return mercyImpact;
         }
 };

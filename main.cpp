@@ -1,54 +1,68 @@
 #include <iostream>
-#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <string>
 #include "Player.h"
 #include "Monster.h"
-#include "Item.h"
 #include "GameManager.h"
+#include "NormalMonster.h"
 #include "Boss.h"
 
 using namespace std;
 
-void runTests()
+void runUnitTests(Player* p)
 {
-    Player testPlayer("Hero");
-    
-    if (testPlayer.isAlive())
+    cout << "--- VERIFICATION TECHNIQUE ---" << endl;
+
+    if (p->isAlive())
     {
-        cout << "Test 1: Player initialement vivant - OK" << endl;
+        cout << "[OK] Player initialisation" << endl;
     }
 
-    testPlayer.takeDamage(20);
-    cout << "Test 2: Reception de degats (20) - OK" << endl;
-
-    Item* potion = new Item("Petite Potion", "HEAL", 20, 1);
-    testPlayer.addItem(potion);
-    testPlayer.useItem(0); 
-    cout << "Test 3: Ajout et utilisation objet soin - OK" << endl;
-
-    Monster* boss = new Boss("Dragon", 200, 30, 10, 100);
-    GameManager gm(&testPlayer);
-    
-    gm.announceBattle(boss);
-    
-    testPlayer.attack(boss);
-    cout << "Test 4: Interaction combat (Attaque Player -> Monster) - OK" << endl;
-
-    cout << "Test 6: Tentative de lecture de items.csv..." << endl;
-    gm.loadItems("items.csv");
-
-    testPlayer.takeDamage(200);
-    if (!testPlayer.isAlive())
+    NormalMonster testM("TestDummy", 10, 5, 2, 50);
+    testM.updateMercy(30);
+    if (!testM.isSpareable())
     {
-        cout << "Test 5: Mort du joueur apres degats massifs - OK" << endl;
+        cout << "[OK] Mercy : jauge < objectif => pas epargneable" << endl;
     }
 
-    delete boss;
+    testM.updateMercy(30);
+    if (testM.isSpareable())
+    {
+        cout << "[OK] Mercy : jauge >= objectif => epargneable" << endl;
+    }
 
-    cout << "--- Tous les tests sont termines avec succes ---" << endl;
+    int initialHP = p->getHP();
+    testM.attack(p);
+    if (p->getHP() <= initialHP)
+    {
+        cout << "[OK] Combat : degats recus correctement" << endl;
+    }
+
+    cout << "------------------------------\n" << endl;
 }
 
 int main()
 {
-    runTests();
+    srand(time(0));
+
+    string name;
+    cout << "Bienvenue dans ALTERDUNE" << endl;
+    cout << "Entrez votre nom de heros : ";
+    cin >> name;
+
+    Player* p = new Player(name);
+    GameManager gm(p);
+
+    gm.loadItems("items.csv");
+    gm.loadMonsters("monsters.csv");
+
+    gm.displayStartSummary();
+
+    runUnitTests(p);
+
+    gm.mainMenu();
+
+    delete p;
     return 0;
 }

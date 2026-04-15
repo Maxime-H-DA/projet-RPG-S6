@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-#include <vector>
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -15,6 +15,8 @@ class Entity
         int de;
 
     public:
+        virtual ~Entity() {}
+
         Entity(string pname, int phpmax, int php, int pat, int pde)
         {
             name = pname;
@@ -23,14 +25,21 @@ class Entity
             at = pat;
             de = pde;
         }
-        
-        virtual void takeDamage(int amount)
+
+        void attack(Entity* target)
         {
-            hp -= (amount - de);
+            int damage = rand() % (target->getHPMax() + 1);
+            cout << name << " attaque pour " << damage << " degats !" << endl;
+            target->takeDamage(damage);
+        }
+
+        virtual void takeDamage(int damage)
+        {
+            hp -= damage;
             if (hp < 0)
             {
                 hp = 0;
-            } 
+            }
         }
 
         bool isAlive()
@@ -41,5 +50,25 @@ class Entity
         string getName()
         {
             return name;
+        }
+
+        int getHP()
+        {
+            return hp;
+        }
+
+        int getHPMax()
+        {
+            return hpMax;
+        }
+
+        int getAt()
+        {
+            return at;
+        }
+
+        int getDe()
+        {
+            return de;
         }
 };

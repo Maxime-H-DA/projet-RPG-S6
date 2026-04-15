@@ -9,16 +9,16 @@ class Item
     private:
         string name;
         string type;
-        int quantity;
         int value;
+        int quantity;
 
     public:
-        Item(string itemName, string itemType, int itemValue, int itemQuantity)
+        Item(string pname, string ptype, int pvalue, int pquantity)
         {
-            name = itemName;
-            type = itemType;
-            value = itemValue;
-            quantity = itemQuantity;
+            name = pname;
+            type = ptype;
+            value = pvalue;
+            quantity = pquantity;
         }
 
         string getName()
