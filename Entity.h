@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
 #include <iostream>
-#include <cstdlib>
+#include <random>
 
 using namespace std;
+
+static mt19937 rng(random_device{}());
 
 class Entity
 {
@@ -17,18 +19,26 @@ class Entity
     public:
         virtual ~Entity() {}
 
-        Entity(string pname, int phpmax, int php, int pat, int pde)
+        virtual string getCategory() const = 0;
+
+        Entity(string pname, int phpmax, int pat, int pde)
         {
             name = pname;
             hpMax = phpmax;
-            hp = php;
+            hp = phpmax;
             at = pat;
             de = pde;
         }
 
-        void attack(Entity* target)
+        virtual void attack(Entity* target)
         {
-            int damage = rand() % (target->getHPMax() + 1);
+            int base = at - target->getDe();
+            if (base < 1)
+            {
+                base = 1;
+            }
+            uniform_int_distribution<int> dist(base / 100, base / 50);
+            int damage = dist(rng);
             cout << name << " attaque pour " << damage << " degats !" << endl;
             target->takeDamage(damage);
         }
@@ -51,24 +61,29 @@ class Entity
         {
             return name;
         }
-
         int getHP()
         {
             return hp;
         }
-
         int getHPMax()
         {
             return hpMax;
         }
-
         int getAt()
         {
             return at;
         }
+        int getDe() 
+        { 
+            return de; 
+        }
 
-        int getDe()
+        void setHP(int hpValue)
         {
-            return de;
+            hp = hpValue;
+            if (hp > hpMax)
+            {
+                hp = hpMax;
+            }
         }
 };

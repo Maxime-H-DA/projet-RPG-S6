@@ -24,12 +24,10 @@ class ActAction
         {
             return id;
         }
-
         string getText()
         {
             return text;
         }
-
         int getImpact()
         {
             return mercyImpact;

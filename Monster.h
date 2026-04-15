@@ -16,7 +16,7 @@ class Monster : public Entity
 
     public:
         Monster(string pname, int health, int attack, int defense, int goal, string pcategory)
-            : Entity(pname, health, health, attack, defense)
+            : Entity(pname, health, attack, defense)
         {
             mercyGauge = 0;
             mercyGoal = goal;
@@ -43,27 +43,24 @@ class Monster : public Entity
             return mercyGauge >= mercyGoal;
         }
 
-        string getCategory()
-        {
-            return category;
-        }
-
-        int getMercyGauge()
-        {
-            return mercyGauge;
-        }
-
-        int getMercyGoal()
-        {
-            return mercyGoal;
-        }
-
         void addAction(string actionID)
         {
             availableActions.push_back(actionID);
         }
 
-        vector<string> getActions()
+        string getCategory() const override
+        {
+            return category;
+        }
+        int getMercyGauge() 
+        {
+            return mercyGauge;
+        }
+        int getMercyGoal()  
+        {
+            return mercyGoal;
+        }
+        vector<string> getActions()    
         {
             return availableActions;
         }

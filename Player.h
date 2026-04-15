@@ -16,11 +16,38 @@ class Player : public Entity
         int totalVictories;
 
     public:
-        Player(string playerName) : Entity(playerName, 100, 100, 10, 5)
+        Player(string playerName) : Entity(playerName, 100, 100, 100)
         {
             monstersKilled = 0;
             monstersSpared = 0;
             totalVictories = 0;
+        }
+
+        ~Player()
+        {
+            for (Item* item : inventory)
+            {
+                delete item;
+            }
+            inventory.clear();
+        }
+
+        virtual void attack(Entity* target) override
+        {
+            int base = at - target->getDe();
+            if (base < 1)
+            {
+                base = 1;
+            }
+            uniform_int_distribution<int> dist(base , base * 5);
+            int damage = dist(rng);
+            cout << name << " attaque pour " << damage << " degats !" << endl;
+            target->takeDamage(damage);
+        }
+
+        string getCategory() const override 
+        {
+            return "PLAYER";
         }
 
         void useItem(int index)
@@ -40,17 +67,9 @@ class Player : public Entity
                 {
                     hp = hpMax;
                 }
-                cout << "Tu utilises " << item->getName() << " : +" << item->getValue() << " HP." << endl;
-            }
-            else if (item->getType() == "BUFF_DEF")
-            {
-                de += item->getValue();
-                cout << "Tu utilises " << item->getName() << " : +" << item->getValue() << " DEF." << endl;
-            }
-            else if (item->getType() == "BUFF_ATK")
-            {
-                at += item->getValue();
-                cout << "Tu utilises " << item->getName() << " : +" << item->getValue() << " ATK." << endl;
+                cout << "Tu utilises " << item->getName()
+                     << " : +" << item->getValue() << " HP. (HP : "
+                     << hp << "/" << hpMax << ")" << endl;
             }
 
             int newQty = item->getQuantity() - 1;
@@ -72,12 +91,12 @@ class Player : public Entity
                 cout << "L'inventaire est vide." << endl;
                 return;
             }
-            for (size_t i = 0; i < inventory.size(); ++i)
+            for (int i = 0; i < (int)inventory.size(); ++i)
             {
                 cout << i << ". " << inventory[i]->getName()
-                     << " [" << inventory[i]->getType() << "]"
-                     << " valeur: " << inventory[i]->getValue()
-                     << " qty: " << inventory[i]->getQuantity() << endl;
+                     << "  [" << inventory[i]->getType()
+                     << " +" << inventory[i]->getValue() << " HP]"
+                     << "  qty: " << inventory[i]->getQuantity() << endl;
             }
         }
 
@@ -90,15 +109,13 @@ class Player : public Entity
         {
             return monstersKilled;
         }
-
         int getSparedCount()
         {
             return monstersSpared;
         }
-
-        int getTotalVictories()
-        {
-            return totalVictories;
+        int getTotalVictories() 
+        { 
+            return totalVictories; 
         }
 
         void addKill()

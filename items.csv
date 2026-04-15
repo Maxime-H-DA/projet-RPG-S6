@@ -1,12 +1,2 @@
-Category;Name;Type;Valeur;Quantity
-Potion;mini_potion;HEAL;20;50
-Potion;super_potion;HEAL;50;20
-Potion;elixir de vie;HEAL;100;3
-Shield;bouclier en bois;BUFF_DEF;20;40
-Shield;bouclier en metal;BUFF_DEF;50;25
-Shield;bouclier en diamant;BUFF_DEF;100;2
-Weapon;dag;BUFF_ATK;10;12
-Weapon;epee emoussee;BUFF_ATK;20;1
-Weapon;Amaterasu;BUFF_ATK;70;1
-Weapon;Double epee;BUFF_ATK;50;1
-Weapon;SenbonSakura;BUFF_ATK;70;1
+mini_potion;HEAL;20;2
+super_potion;HEAL;50;1
