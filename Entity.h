@@ -37,7 +37,7 @@ class Entity
             {
                 base = 1;
             }
-            uniform_int_distribution<int> dist(base / 100, base / 50);
+            uniform_int_distribution<int> dist(base / 50, base / 10);
             int damage = dist(rng);
             cout << name << " attaque pour " << damage << " degats !" << endl;
             target->takeDamage(damage);

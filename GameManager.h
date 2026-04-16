@@ -169,8 +169,29 @@ class GameManager
             file.close();
         }
 
+        void prepareMonster(Monster* enemy)
+        {
+            int limit = enemy->getMaxActions();
+            vector<string> actionList;
+
+            for (auto const& entry : actionCatalog)
+            {
+                actionList.push_back(entry.first);
+            }
+
+            for (int i = 0; i < limit && !actionList.empty(); ++i)
+            {
+                uniform_int_distribution<int> dist(0, (int)actionList.size() - 1);
+                int randomIndex = dist(rng);
+
+                enemy->addAction(actionList[randomIndex]);
+                actionList.erase(actionList.begin() + randomIndex);
+            }
+        }
+
         void startCombat(Monster* enemy)
         {
+            prepareMonster(enemy);
             cout << "\n=== BATAILLE : " << player->getName()
                  << " VS " << enemy->getName() << " ===" << endl;
 
@@ -196,7 +217,7 @@ class GameManager
                     player->attack(enemy);
                     if (!enemy->isAlive())
                     {
-                        player->addKill();
+                        player->addKill(enemy->getCategory());
                         cout << enemy->getName() << " est mort !" << endl;
                         combatResult = "Tue";
                         combatOver   = true;
@@ -213,7 +234,7 @@ class GameManager
                     int actChoice;
                     cin >> actChoice;
 
-                    if (actChoice >= 0 && actChoice < (int)acts.size())
+                    if (actChoice >= 0 && actChoice < enemy->getMaxActions())
                     {
                         string id = acts[actChoice];
                         if (actionCatalog.count(id))
@@ -221,7 +242,7 @@ class GameManager
                             cout << actionCatalog[id].getText() << endl;
                             enemy->updateMercy(actionCatalog[id].getImpact());
                             cout << "Mercy : " << enemy->getMercyGauge()
-                                 << "/" << enemy->getMercyGoal() << endl;
+                                << "/" << enemy->getMercyGoal() << endl;
                         }
                     }
                 }
@@ -362,7 +383,10 @@ class GameManager
                 else if (choice == 3)
                 {
                     cout << "\n--- STATS DE " << player->getName() << " ---" << endl;
+                    cout << "Niveau   : " << player->getLevel() << " (XP : " << player->getXP() << "/3)" << endl;
                     cout << "HP       : " << player->getHP() << " / " << player->getHPMax() << endl;
+                    cout << "ATK      : " << player->getAt() << endl;
+                    cout << "DEF      : " << player->getDe() << endl;
                     cout << "Tues     : " << player->getKilledCount() << endl;
                     cout << "Epargnes : " << player->getSparedCount() << endl;
                     cout << "Victoires: " << player->getTotalVictories() << " / 10" << endl;
@@ -386,16 +410,20 @@ class GameManager
             outFile << "--- HISTORIQUE DES RENCONTRES D'ALTERDUNE ---" << endl;
             for (const auto& entry : defeatedLog)
             {
-                outFile << "Nom : " << entry.name 
-                        << " | Categorie : " << entry.category 
+                outFile << "Nom : " << entry.name
+                        << " | Categorie : " << entry.category
+                        << " | HP max : " << entry.hpMax
+                        << " | ATK : " << entry.at
+                        << " | DEF : " << entry.de
                         << " | Resultat : " << entry.result << endl;
             }
-            
+
             outFile << "-------------------------------------------" << endl;
             outFile << "Statistiques finales de " << player->getName() << " :" << endl;
-            outFile << "Kills : " << player->getKilledCount() << endl;
+            outFile << "Niveau : " << player->getLevel() << endl;
+            outFile << "Kills  : " << player->getKilledCount() << endl;
             outFile << "Spares : " << player->getSparedCount() << endl;
-            
+
             outFile.close();
             cout << "Historique sauvegarde dans history.txt" << endl;
         }

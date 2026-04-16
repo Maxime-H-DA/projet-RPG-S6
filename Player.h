@@ -14,6 +14,8 @@ class Player : public Entity
         int monstersKilled;
         int monstersSpared;
         int totalVictories;
+        int level;
+        int xp;
 
     public:
         Player(string playerName) : Entity(playerName, 100, 100, 100)
@@ -21,6 +23,8 @@ class Player : public Entity
             monstersKilled = 0;
             monstersSpared = 0;
             totalVictories = 0;
+            level = 1;
+            xp = 0;
         }
 
         ~Player()
@@ -39,15 +43,57 @@ class Player : public Entity
             {
                 base = 1;
             }
-            uniform_int_distribution<int> dist(base , base * 5);
+
+            float multiplier = 1.0;
+
+            if (target->getCategory() == "BOSS")
+            {
+                multiplier = 0.8; 
+            }
+            else if (target->getCategory() == "MINIBOSS")
+            {
+                multiplier = 1.0; 
+            }
+            else if (target->getCategory() == "NORMAL")
+            {
+                multiplier = 1.2;
+            }
+            uniform_int_distribution<int> dist(base, base * multiplier);
             int damage = dist(rng);
             cout << name << " attaque pour " << damage << " degats !" << endl;
             target->takeDamage(damage);
         }
 
-        string getCategory() const override 
+        string getCategory() const override
         {
             return "PLAYER";
+        }
+
+        void gainXP(int amount)
+        {
+            xp += amount;
+            int xpNeeded = 3;
+            while (xp >= xpNeeded)
+            {
+                xp -= xpNeeded;
+                level++;
+                at += 5;
+                de += 5;
+                hpMax += 10;
+                hp = hpMax;
+                cout << "\n*** LEVEL UP ! Niveau " << level << " ***" << endl;
+                cout << "ATK +" << 5 << " | DEF +" << 5 << " | HP max +" << 10 << endl;
+                cout << "HP restaures : " << hp << "/" << hpMax << "\n" << endl;
+            }
+        }
+
+        int getLevel()
+        {
+            return level;
+        }
+        int getXP()
+        {
+            return xp;
         }
 
         void useItem(int index)
@@ -113,20 +159,37 @@ class Player : public Entity
         {
             return monstersSpared;
         }
-        int getTotalVictories() 
-        { 
-            return totalVictories; 
+        int getTotalVictories()
+        {
+            return totalVictories;
         }
 
-        void addKill()
+        void addKill(string category)
         {
             monstersKilled++;
             totalVictories++;
+            
+            int xpGagne = 1;
+            if (category == "BOSS")
+            {
+                xpGagne = 5;
+            }
+            else if (category == "NORMAL")
+            {
+                xpGagne = 2;
+            }
+            else if (category == "MINIBOSS")
+            {
+                xpGagne = 3;
+            }
+            
+            gainXP(xpGagne);
         }
 
         void addSpare()
         {
             monstersSpared++;
             totalVictories++;
+            gainXP(1);
         }
 };

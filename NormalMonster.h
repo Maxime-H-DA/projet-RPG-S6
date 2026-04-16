@@ -11,4 +11,9 @@ class NormalMonster : public Monster
             : Monster(pname, health, attack, defense, goal, "NORMAL")
         {
         }
+
+        int getMaxActions() const override
+        {
+            return 2;
+        }
 };

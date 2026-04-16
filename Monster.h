@@ -25,6 +25,13 @@ class Monster : public Entity
 
         virtual ~Monster() {}
 
+        virtual int getMaxActions() const = 0;
+
+        string getCategory() const override
+        {
+            return category;
+        }
+
         void updateMercy(int amount)
         {
             mercyGauge += amount;
@@ -45,13 +52,12 @@ class Monster : public Entity
 
         void addAction(string actionID)
         {
-            availableActions.push_back(actionID);
+            if ((int)availableActions.size() < getMaxActions())
+            {
+                availableActions.push_back(actionID);
+            }
         }
 
-        string getCategory() const override
-        {
-            return category;
-        }
         int getMercyGauge() 
         {
             return mercyGauge;

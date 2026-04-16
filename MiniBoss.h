@@ -11,4 +11,9 @@ class MiniBoss : public Monster
             : Monster(pname, health, attack, defense, goal, "MINIBOSS")
         {
         }
+
+        int getMaxActions() const override
+        {
+            return 3;
+        }
 };

@@ -33,6 +33,7 @@ void runUnitTests(Player* p)
 
     int initialHP = p->getHP();
     testM.attack(p);
+    p->setHP(p->getHPMax());
     if (p->getHP() <= initialHP)
     {
         cout << "Combat : degats recus correctement" << endl;
@@ -58,8 +59,6 @@ int main()
 
     gm.displayStartSummary();
     runUnitTests(p);
-
-    p->setHP(100);
 
     gm.mainMenu();
 
