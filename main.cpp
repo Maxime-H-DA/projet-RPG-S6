@@ -2,53 +2,50 @@
 #include <string>
 #include "Player.h"
 #include "Monster.h"
-#include "GameManager.h"
 #include "NormalMonster.h"
-#include "Boss.h"
+#include "GameManager.h"
 
 using namespace std;
 
 void runUnitTests(Player* p)
 {
-    cout << "--- Test Unitaire ---" << endl;
-
-    if (p->isAlive())
-    {
-        cout << "Player initialisation" << endl;
-    }
-
-    NormalMonster testM("TestDummy", 10, 5, 2, 50);
-
-    testM.updateMercy(30);
-    if (!testM.isSpareable())
-    {
-        cout << "Mercy : jauge < objectif => pas epargneable" << endl;
-    }
-
-    testM.updateMercy(30);
-    if (testM.isSpareable())
-    {
-        cout << "Mercy : jauge >= objectif => epargneable" << endl;
-    }
-
+    cout << "--- TESTS LOGIQUES ---" << endl;
+    NormalMonster dummy("Cible", 50, 10, 5, 20);
+    
     int initialHP = p->getHP();
-    testM.attack(p);
-    p->setHP(p->getHPMax());
-    if (p->getHP() <= initialHP)
+    dummy.attack(p);
+    if (p->getHP() < initialHP)
     {
-        cout << "Combat : degats recus correctement" << endl;
+        cout << "Reception degats : OK" << endl;
+    }
+    p->setHP(p->getHPMax());
+
+    dummy.updateMercy(20);
+    if (dummy.isSpareable())
+    {
+        cout << "Systeme Mercy : OK" << endl;
     }
 
-    cout << "------------------------------\n" << endl;
+    int initialLV = p->getLevel();
+    p->gainXP(5);
+    if(p->getLevel() > initialLV)
+    {
+        cout << "Test Level Up : OK" << endl;
+    }
 
+    p->setlevel(1);
+    p->setHPMax(100);
+    p->setHP(p->getHPMax());
+    p->setAt(30);
+    p->setDe(10);
+
+    cout << "----------------------" << endl;
 }
-
 
 int main()
 {
     string name;
-    cout << "Bienvenue dans ALTERDUNE" << endl;
-    cout << "Entrez votre nom de heros : ";
+    cout << "Nom du heros : ";
     cin >> name;
 
     Player* p = new Player(name);
@@ -57,9 +54,7 @@ int main()
     gm.loadItems("items.csv");
     gm.loadMonsters("monsters.csv");
 
-    gm.displayStartSummary();
     runUnitTests(p);
-
     gm.mainMenu();
 
     delete p;

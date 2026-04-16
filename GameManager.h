@@ -1,15 +1,15 @@
 #pragma once
 #include <iostream>
-#include <string>
 #include <vector>
 #include <map>
 #include <fstream>
 #include <sstream>
+#include <limits>
 #include "Player.h"
 #include "Monster.h"
 #include "NormalMonster.h"
-#include "Boss.h"
 #include "MiniBoss.h"
+#include "Boss.h"
 #include "ActAction.h"
 
 using namespace std;
@@ -19,8 +19,6 @@ struct BestiaryEntry
     string name;
     string category;
     int hpMax;
-    int at;
-    int de;
     string result;
 };
 
@@ -31,38 +29,37 @@ class GameManager
         vector<Monster*> bestiary;
         vector<BestiaryEntry> defeatedLog;
         map<string, ActAction> actionCatalog;
+        bool gameRunning;
+        int totalEncounters = 0;
+        int lastMiniBossTurn = -5;
+
+        void flushInput()
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
 
     public:
         GameManager(Player* p)
         {
             player = p;
-
-            actionCatalog["JOKE"] = ActAction("JOKE","Tu racontes une blague nulle. Le monstre rit quand meme !", 20);
-            actionCatalog["COMPLIMENT"] = ActAction("COMPLIMENT", "Tu flattes le monstre sur sa coiffure. Il est touche.", 15);
-            actionCatalog["DANCE"] = ActAction("DANCE","Tu fais le robot. Le monstre est gene pour toi.", 10);
-            actionCatalog["PET"] = ActAction("PET","Tu le grattes derriere l'oreille. Il ronronne.", 25);
-            actionCatalog["DISCUSS"] = ActAction("DISCUSS","Tu parles meteo. Le monstre baille poliment.", 5);
-            actionCatalog["OBSERVE"] = ActAction("OBSERVE","Tu fixes le monstre en silence. Malaise total.", 0);
-            actionCatalog["INSULT"] = ActAction("INSULT","Tu es odieux. Le monstre est offense !", -15);
-            actionCatalog["THREATEN"] = ActAction("THREATEN","Tu brandis le poing. Le monstre se met en colere !", -10);
+            actionCatalog["JOKE"] = ActAction("JOKE", "Le monstre explose de rire.", 20);
+            actionCatalog["COMPLIMENT"] = ActAction("COMPLIMENT", "Le monstre rougit.", 15);
+            actionCatalog["DANCE"] = ActAction("DANCE", "Le monstre danse avec vous.", 10);
+            actionCatalog["PET"] = ActAction("PET", "Le monstre ronronne.", 25);
+            actionCatalog["DISCUSS"] = ActAction("DISCUSS", "Le monstre vous ecoute.", 5);
+            actionCatalog["OBSERVE"] = ActAction("OBSERVE", "Le monstre est intrigue.", 0);
+            actionCatalog["INSULT"] = ActAction("INSULT", "Le monstre s'enerve.", -15);
+            actionCatalog["THREATEN"] = ActAction("THREATEN", "Le monstre tremble.", -10);
+            gameRunning = true;
         }
 
         ~GameManager()
         {
-            for (int i = 0; i < (int)bestiary.size(); ++i)
+            for (Monster* m : bestiary)
             {
-                delete bestiary[i];
+                delete m;
             }
-        }
-
-        void displayStartSummary()
-        {
-            cout << "\n=== BIENVENUE DANS ALTERDUNE ===" << endl;
-            cout << "Heros : " << player->getName() << endl;
-            cout << "HP    : " << player->getHP() << " / " << player->getHPMax() << endl;
-            cout << "Inventaire de depart :" << endl;
-            player->showInventory();
-            cout << "================================\n" << endl;
         }
 
         void loadItems(string filename)
@@ -70,37 +67,29 @@ class GameManager
             ifstream file(filename);
             if (!file.is_open())
             {
-                cout << "Erreur : impossible d'ouvrir " << filename << endl;
                 return;
             }
-
             string line;
             while (getline(file, line))
             {
-                stringstream ss(line);
-                string name, type, valStr, qtyStr;
-
-                getline(ss, name,';');
-                getline(ss, type,';');
-                getline(ss, valStr,';');
-                getline(ss, qtyStr,';');
-
-                if (name.empty() || type.empty() || valStr.empty() || qtyStr.empty())
+                if (line.empty())
                 {
-                    cout << "Ligne ignoree : " << line << endl;
                     continue;
                 }
-
-                try
+                stringstream ss(line);
+                string n, t, v, q;
+                if (getline(ss, n, ';') && getline(ss, t, ';') && getline(ss, v, ';') && getline(ss, q, ';'))
                 {
-                    player->addItem(new Item(name, type, stoi(valStr), stoi(qtyStr)));
-                }
-                catch (...)
-                {
-                    cout << "Ligne ignoree (valeur invalide) : " << line << endl;
+                    try 
+                    {
+                        player->addItem(new Item(n, t, stoi(v), stoi(q)));
+                    }
+                    catch (...)
+                    {
+                        cerr << "Erreur de formatage sur la ligne : " << line << endl;
+                    }
                 }
             }
-            file.close();
         }
 
         void loadMonsters(string filename)
@@ -108,119 +97,86 @@ class GameManager
             ifstream file(filename);
             if (!file.is_open())
             {
-                cout << "Erreur : impossible d'ouvrir " << filename << endl;
                 return;
             }
 
             string line;
             while (getline(file, line))
             {
+                if (line.empty())
+                {
+                    continue;
+                }
                 stringstream ss(line);
-                string category, name, hp, at, de, goal, act;
+                string cat, n, h, a, d, g, act1, act2, act3;
 
-                getline(ss, category, ';');
-                getline(ss, name, ';');
-                getline(ss, hp, ';');
-                getline(ss, at, ';');
-                getline(ss, de, ';');
-                getline(ss, goal, ';');
-
-                if (category.empty() || name.empty() || hp.empty())
-                {
-                    cout << "Ligne ignoree : " << line << endl;
-                    continue;
-                }
-
-                Monster* m = nullptr;
-
-                try
-                {
-                    if (category == "NORMAL")
+                if (getline(ss, cat, ';') && getline(ss, n, ';') && getline(ss, h, ';') && 
+                    getline(ss, a, ';') && getline(ss, d, ';') && getline(ss, g, ';'))
                     {
-                        m = new NormalMonster(name, stoi(hp), stoi(at), stoi(de), stoi(goal));
-                    }
-                    else if (category == "MINIBOSS")
-                    {
-                        m = new MiniBoss(name, stoi(hp), stoi(at), stoi(de), stoi(goal));
-                    }
-                    else if (category == "BOSS")
-                    {
-                        m = new Boss(name, stoi(hp), stoi(at), stoi(de), stoi(goal));
-                    }
-                }
-                catch (...)
-                {
-                    cout << "Ligne ignoree (valeur invalide) : " << line << endl;
-                    continue;
-                }
-
-                if (m != nullptr)
-                {
-                    while (getline(ss, act, ';'))
-                    {
-                        if (!act.empty() && act != "-")
+                        try
                         {
-                            m->addAction(act);
-                        }
+                            Monster* m = nullptr;
+                            if (cat == "NORMAL")
+                            {
+                                m = new NormalMonster(n, stoi(h), stoi(a), stoi(d), stoi(g));
+                            }
+                            else if (cat == "MINIBOSS")
+                            {
+                                m = new MiniBoss(n, stoi(h), stoi(a), stoi(d), stoi(g));
+                            }
+                            else if (cat == "BOSS")
+                            {
+                                m = new Boss(n, stoi(h), stoi(a), stoi(d), stoi(g));
+                            }
+
+                            if (m)
+                            {
+                                while (getline(ss, act1, ';'))
+                                {
+                                    if (!act1.empty())
+                                    {
+                                        m->addAction(act1);
+                                    }
+                                }
+                                bestiary.push_back(m);
+                            }
                     }
-                    bestiary.push_back(m);
+                    catch (...)
+                    {
+                        cerr << "Erreur sur la ligne monstre : " << line << endl;
+                    }
                 }
-            }
-            file.close();
-        }
-
-        void prepareMonster(Monster* enemy)
-        {
-            int limit = enemy->getMaxActions();
-            vector<string> actionList;
-
-            for (auto const& entry : actionCatalog)
-            {
-                actionList.push_back(entry.first);
-            }
-
-            for (int i = 0; i < limit && !actionList.empty(); ++i)
-            {
-                uniform_int_distribution<int> dist(0, (int)actionList.size() - 1);
-                int randomIndex = dist(rng);
-
-                enemy->addAction(actionList[randomIndex]);
-                actionList.erase(actionList.begin() + randomIndex);
             }
         }
 
         void startCombat(Monster* enemy)
         {
-            prepareMonster(enemy);
-            cout << "\n=== BATAILLE : " << player->getName()
-                 << " VS " << enemy->getName() << " ===" << endl;
+            cout << "\n--- Combat : " << enemy->getName() << " ---" << endl;
+            cout << "   CATEGORIE : " << enemy->getCategory() << endl;
+            bool over = false;
+            string finalStatus = "En cours";
 
-            bool combatOver = false;
-            string combatResult = "";
-
-            while (player->isAlive() && enemy->isAlive() && !combatOver)
+            while (player->isAlive() && enemy->isAlive() && !over)
             {
-                cout << "\n"
-                     << player->getName() << " HP: " << player->getHP() << "/" << player->getHPMax()
-                     << "   "
-                     << enemy->getName() << " HP: " << enemy->getHP() << "/" << enemy->getHPMax()
-                     << "   Mercy: " << enemy->getMercyGauge() << "/" << enemy->getMercyGoal()
-                     << endl;
-
-                cout << "1. FIGHT   2. ACT   3. ITEM   4. MERCY" << endl;
-
+                cout << "\n" << player->getName() << " HP: " << player->getHP() << "/" << player->getHPMax() << endl;
+                cout << enemy->getName() << " HP: " << enemy->getHP() << " Mercy: " << enemy->getMercyGauge() << "/" << enemy->getMercyGoal() << endl;
+                cout << "1. FIGHT | 2. ACT | 3. ITEM | 4. MERCY" << endl;
+                
                 int choice;
-                cin >> choice;
+                if (!(cin >> choice))
+                {
+                    flushInput();
+                    continue;
+                }
 
                 if (choice == 1)
                 {
                     player->attack(enemy);
-                    if (!enemy->isAlive())
-                    {
-                        player->addKill(enemy->getCategory());
-                        cout << enemy->getName() << " est mort !" << endl;
-                        combatResult = "Tue";
-                        combatOver   = true;
+                    if (!enemy->isAlive()) 
+                    { 
+                        player->addKill(enemy->getCategory()); 
+                        finalStatus = "Tue"; 
+                        over = true; 
                     }
                 }
                 else if (choice == 2)
@@ -230,73 +186,52 @@ class GameManager
                     {
                         cout << i << ". " << acts[i] << endl;
                     }
-
-                    int actChoice;
-                    cin >> actChoice;
-
-                    if (actChoice >= 0 && actChoice < enemy->getMaxActions())
+                    int actIdx;
+                    cin >> actIdx;
+                    if (actIdx >= 0 && actIdx < (int)acts.size())
                     {
-                        string id = acts[actChoice];
-                        if (actionCatalog.count(id))
-                        {
-                            cout << actionCatalog[id].getText() << endl;
-                            enemy->updateMercy(actionCatalog[id].getImpact());
-                            cout << "Mercy : " << enemy->getMercyGauge()
-                                << "/" << enemy->getMercyGoal() << endl;
-                        }
+                        ActAction a = actionCatalog[acts[actIdx]];
+                        cout << "> " << a.getText() << endl;
+                        enemy->updateMercy(a.getImpact());
                     }
                 }
                 else if (choice == 3)
                 {
                     player->showInventory();
-                    cout << "Quel objet ? (-1 pour annuler) : ";
-                    int itemIdx;
-                    cin >> itemIdx;
-                    if (itemIdx != -1)
-                    {
-                        player->useItem(itemIdx);
-                    }
+                    int idx;
+                    cin >> idx;
+                    player->useItem(idx);
                 }
                 else if (choice == 4)
                 {
-                    if (enemy->isSpareable())
-                    {
-                        player->addSpare();
-                        cout << "Tu as epargne " << enemy->getName() << " !" << endl;
-                        combatResult = "Epargne";
-                        combatOver = true;
+                    if (enemy->isSpareable()) 
+                    { 
+                        player->addSpare(); 
+                        finalStatus = "Epargne"; 
+                        cout << enemy->getName() << " baisse sa garde et quitte le combat sans rancune." << endl;
+                        over = true; 
                     }
-                    else
+                    else 
                     {
-                        cout << "Le monstre refuse. (Mercy: "
-                             << enemy->getMercyGauge() << "/" << enemy->getMercyGoal() << ")" << endl;
+                        cout << enemy->getName() << " ne semble pas encore pret a vous pardonner." << endl;
                     }
                 }
 
-                if (enemy->isAlive() && !combatOver)
+                if (enemy->isAlive() && !over)
                 {
                     enemy->attack(player);
                 }
             }
 
-            if (!player->isAlive())
-            {
-                cout << "\nTu as ete vaincu... GAME OVER." << endl;
-                exit(0);
-            }
+            defeatedLog.push_back({enemy->getName(), enemy->getCategory(), enemy->getHPMax(), finalStatus});
 
-            if (!combatResult.empty())
-            {
-                BestiaryEntry entry;
-                entry.name = enemy->getName();
-                entry.category = enemy->getCategory();
-                entry.hpMax = enemy->getHPMax();
-                entry.at = enemy->getAt();
-                entry.de = enemy->getDe();
-                entry.result = combatResult;
-                defeatedLog.push_back(entry);
+            if (!player->isAlive()) 
+            { 
+                cout << "\n--- VOUS AVEZ ECHOUE ---" << endl;
+                saveHistory(); 
+                gameRunning = false;
             }
-
+            
             if (player->getTotalVictories() >= 10)
             {
                 checkEnding();
@@ -305,126 +240,123 @@ class GameManager
 
         void checkEnding()
         {
-            cout << "\n*** FIN DU JEU ***" << endl;
+            cout << "\n--- DESTIN D'ALTERDUNE ---" << endl;
             if (player->getSparedCount() == 10)
             {
-                cout << "FIN PACIFISTE : Tu as apporte la paix !" << endl;
+                cout << "FIN PACIFISTE : Vous avez apporte la paix." << endl;
             }
             else if (player->getKilledCount() == 10)
             {
-                cout << "FIN GENOCIDAIRE : Tu as aneanti tout le monde..." << endl;
+                cout << "FIN GENOCIDAIRE : Il ne reste plus rien." << endl;
             }
             else
             {
-                cout << "FIN NEUTRE : Tes choix ont ete ambigus." << endl;
+                cout << "FIN NEUTRE : Le monde reste en equilibre." << endl;
             }
             saveHistory();
-            exit(0);
-        }
-
-        void showDefeatedBestiary()
-        {
-            if (defeatedLog.empty())
-            {
-                cout << "Aucun monstre vaincu pour l'instant." << endl;
-                return;
-            }
-
-            cout << "\n--- BESTIAIRE ---" << endl;
-            for (int i = 0; i < (int)defeatedLog.size(); ++i)
-            {
-                cout << "- " << defeatedLog[i].name
-                     << " [" << defeatedLog[i].category << "]"
-                     << "  HP max: " << defeatedLog[i].hpMax
-                     << "  ATK: " << defeatedLog[i].at
-                     << "  DEF: " << defeatedLog[i].de
-                     << "  => " << defeatedLog[i].result << endl;
-            }
-        }
-
-        void mainMenu()
-        {
-            int choice = 0;
-            while (choice != 5 && player->isAlive())
-            {
-                cout << "\n--- MENU PRINCIPAL ---" << endl;
-                cout << "Victoires : " << player->getTotalVictories() << "/10" << endl;
-                cout << "1. Partir au combat" << endl;
-                cout << "2. Items" << endl;
-                cout << "3. Statistiques" << endl;
-                cout << "4. Bestiaire" << endl;
-                cout << "5. Quitter" << endl;
-                cin >> choice;
-                cin.ignore();
-
-                if (choice == 1)
-                {
-                    if (!bestiary.empty())
-                    {
-                        uniform_int_distribution<int> dist(0, (int)bestiary.size() - 1);
-                        startCombat(bestiary[dist(rng)]);
-                    }
-                    else
-                    {
-                        cout << "Aucun monstre charge." << endl;
-                    }
-                }
-                else if (choice == 2)
-                {
-                    player->showInventory();
-                    cout << "Numero de l'objet a utiliser (-1 pour annuler) : ";
-                    int itemIdx;
-                    cin >> itemIdx;
-                    if (itemIdx != -1)
-                    {
-                        player->useItem(itemIdx);
-                    }
-                }
-                else if (choice == 3)
-                {
-                    cout << "\n--- STATS DE " << player->getName() << " ---" << endl;
-                    cout << "Niveau   : " << player->getLevel() << " (XP : " << player->getXP() << "/3)" << endl;
-                    cout << "HP       : " << player->getHP() << " / " << player->getHPMax() << endl;
-                    cout << "ATK      : " << player->getAt() << endl;
-                    cout << "DEF      : " << player->getDe() << endl;
-                    cout << "Tues     : " << player->getKilledCount() << endl;
-                    cout << "Epargnes : " << player->getSparedCount() << endl;
-                    cout << "Victoires: " << player->getTotalVictories() << " / 10" << endl;
-                }
-                else if (choice == 4)
-                {
-                    showDefeatedBestiary();
-                }
-            }
+            gameRunning = false;
         }
 
         void saveHistory()
         {
-            ofstream outFile("history.txt");
-            if (!outFile.is_open())
+            ofstream out("history.txt");
+            out << "HISTORIQUE D'ALTERDUNE" << endl;
+            for (auto& e : defeatedLog)
             {
-                cerr << "Erreur : Impossible de creer le fichier d'historique." << endl;
-                return;
+                out << e.name << " [" << e.category << "] : " << e.result << endl;
             }
+            out.close();
+        }
 
-            outFile << "--- HISTORIQUE DES RENCONTRES D'ALTERDUNE ---" << endl;
-            for (const auto& entry : defeatedLog)
+        void mainMenu()
+        {
+            cout << "   DEBUT DE L'AVENTURE" << endl;
+            cout << "Heros : " << player->getName() << endl;
+            cout << "HP    : " << player->getHP() << "/" << player->getHPMax() << endl;
+            cout << "ATK   : " << player->getAt() << " | DEF : " << player->getDe() << endl;
+            cout << "Inventaire de depart :" << endl;
+            player->showInventory();
+            int choice = 0;
+            while (gameRunning && choice != 5)
             {
-                outFile << "Nom : " << entry.name
-                        << " | Categorie : " << entry.category
-                        << " | HP max : " << entry.hpMax
-                        << " | ATK : " << entry.at
-                        << " | DEF : " << entry.de
-                        << " | Resultat : " << entry.result << endl;
+                cout << "\n--- MENU (Victories: " << player->getTotalVictories() << "/10) ---" << endl;
+                cout << "1. Explorer\n2. Inventaire\n3. Profil\n4. Journal\n5. Quitter" << endl;
+                if (!(cin >> choice)) 
+                { 
+                    flushInput(); 
+                    continue; 
+                }
+                
+            if (choice == 1 && !bestiary.empty())
+            {
+                totalEncounters++; 
+                vector<Monster*> validMonsters;
+
+                if (player->getTotalVictories() >= 7) 
+                {
+                    for (Monster* m : bestiary)
+                    {
+                        if (m->getCategory() == "BOSS")
+                        {
+                            validMonsters.push_back(m);
+                        }
+                    }
+                }
+                else 
+                {
+                    for (Monster* m : bestiary) 
+                    {
+                        string cat = m->getCategory();
+                        if (cat == "BOSS")
+                        {
+                            continue;
+                        }
+                        if (cat == "MINIBOSS" && totalEncounters <= 3)
+                        {
+                            continue;
+                        }
+                        validMonsters.push_back(m);
+                    }
+                }
+
+                if (validMonsters.empty())
+                {
+                    validMonsters = bestiary;
+                }
+
+                uniform_int_distribution<int> d(0, (int)validMonsters.size() - 1);
+                Monster* selected = validMonsters[d(rng)];
+
+                if (selected->getCategory() == "MINIBOSS")
+                {
+                    lastMiniBossTurn = totalEncounters;
+                }
+
+                selected->setHP(selected->getHPMax());
+                selected->updateMercy(0); 
+                startCombat(selected);
             }
-
-            outFile << "-------------------------------------------" << endl;
-            outFile << "Statistiques finales de " << player->getName() << " :" << endl;
-            outFile << "Niveau : " << player->getLevel() << endl;
-            outFile << "Kills  : " << player->getKilledCount() << endl;
-            outFile << "Spares : " << player->getSparedCount() << endl;
-
-            outFile.close();
-            cout << "Historique sauvegarde dans history.txt" << endl;
+                else if (choice == 2) 
+                {
+                    player->showInventory();
+                }
+                else if (choice == 3) 
+                {
+                    cout << "Kills: " << player->getKilledCount() << " | Spares: " << player->getSparedCount() << " | LV: " << player->getLevel() << endl;
+                    cout << "HP: " << player->getHP() << "/" << player->getHPMax() << " | ATK: " << player->getAt() << " | DEF: " << player->getDe() << endl;
+                }
+                else if (choice == 4)
+                {
+                    for (auto& e : defeatedLog) 
+                    {
+                        cout << e.name << " (" << e.result << ")" << endl;
+                    }
+                }
+                else if (choice == 5)
+                {
+                    gameRunning = false;
+                }
+            }
+            saveHistory();
         }
 };

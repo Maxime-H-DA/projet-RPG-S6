@@ -1,16 +1,11 @@
---- HISTORIQUE DES RENCONTRES D'ALTERDUNE ---
-Nom : Léviator | Categorie : MINIBOSS | Resultat : Tue
-Nom : Crocodil | Categorie : NORMAL | Resultat : Tue
-Nom : Florizarre | Categorie : MINIBOSS | Resultat : Tue
-Nom : Méganium | Categorie : MINIBOSS | Resultat : Tue
-Nom : Germinion | Categorie : NORMAL | Resultat : Tue
-Nom : Maraiste | Categorie : NORMAL | Resultat : Tue
-Nom : Carapuce | Categorie : NORMAL | Resultat : Tue
-Nom : Rayquaza | Categorie : BOSS | Resultat : Tue
-Nom : Léviator | Categorie : MINIBOSS | Resultat : 
-Nom : Evoli | Categorie : NORMAL | Resultat : Tue
-Nom : Aquali | Categorie : NORMAL | Resultat : Tue
--------------------------------------------
-Statistiques finales de ssssssssssssss :
-Kills : 10
-Spares : 0
+HISTORIQUE D'ALTERDUNE
+Carapuce [NORMAL] : Tue
+Herbizarre [NORMAL] : Tue
+Magicarpe [NORMAL] : Tue
+Magicarpe [NORMAL] : Tue
+Tortank [MINIBOSS] : Tue
+Drattak [MINIBOSS] : Tue
+Florizarre [MINIBOSS] : Tue
+Groudon [BOSS] : Tue
+Lugia [BOSS] : Tue
+Lugia [BOSS] : Tue

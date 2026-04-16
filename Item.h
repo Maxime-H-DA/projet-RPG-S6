@@ -25,10 +25,6 @@ class Item
         {
             return name;
         }
-        string getType()
-        {
-            return type;
-        }
         int getValue()
         {
             return value;

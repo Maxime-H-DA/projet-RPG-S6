@@ -18,7 +18,7 @@ class Player : public Entity
         int xp;
 
     public:
-        Player(string playerName) : Entity(playerName, 100, 100, 100)
+        Player(string playerName) : Entity(playerName, 100, 30, 10)
         {
             monstersKilled = 0;
             monstersSpared = 0;
@@ -36,87 +36,52 @@ class Player : public Entity
             inventory.clear();
         }
 
-        virtual void attack(Entity* target) override
-        {
-            int base = at - target->getDe();
-            if (base < 1)
-            {
-                base = 1;
-            }
-
-            float multiplier = 1.0;
-
-            if (target->getCategory() == "BOSS")
-            {
-                multiplier = 0.8; 
-            }
-            else if (target->getCategory() == "MINIBOSS")
-            {
-                multiplier = 1.0; 
-            }
-            else if (target->getCategory() == "NORMAL")
-            {
-                multiplier = 1.2;
-            }
-            uniform_int_distribution<int> dist(base, base * multiplier);
-            int damage = dist(rng);
-            cout << name << " attaque pour " << damage << " degats !" << endl;
-            target->takeDamage(damage);
-        }
-
         string getCategory() const override
         {
             return "PLAYER";
         }
 
+        void attack(Entity* target) override
+        {
+            int base = getAt() - target->getDe();
+            if (base < 1) base = 1;
+
+            uniform_int_distribution<int> dist(base, base * 2.5);
+            int damage = dist(rng);
+            
+            cout << getName() << " dechaine une attaque de " << damage << " degats !" << endl;
+            target->takeDamage(damage);
+        }
+
         void gainXP(int amount)
         {
             xp += amount;
-            int xpNeeded = 3;
-            while (xp >= xpNeeded)
+            while (xp >= 5)
             {
-                xp -= xpNeeded;
+                xp -= 5;
                 level++;
-                at += 5;
-                de += 5;
-                hpMax += 10;
-                hp = hpMax;
-                cout << "\n*** LEVEL UP ! Niveau " << level << " ***" << endl;
-                cout << "ATK +" << 5 << " | DEF +" << 5 << " | HP max +" << 10 << endl;
-                cout << "HP restaures : " << hp << "/" << hpMax << "\n" << endl;
+                setAt(getAt() + 5);
+                setDe(getDe() + 3);
+                setHPMax(getHPMax() + 20);
+                setHP(getHPMax());
+                
+                cout << "\n--- MONTEE DE NIVEAU : " << level << " ---" << endl;
             }
-        }
-
-        int getLevel()
-        {
-            return level;
-        }
-        int getXP()
-        {
-            return xp;
         }
 
         void useItem(int index)
         {
-            if (index < 0 || index >= (int)inventory.size())
-            {
-                cout << "Index invalide." << endl;
-                return;
-            }
+            if (index < 0 || index >= (int)inventory.size()) return;
 
             Item* item = inventory[index];
-
-            if (item->getType() == "HEAL")
+            int newHP = getHP() + item->getValue();
+            if (newHP > getHPMax())
             {
-                hp += item->getValue();
-                if (hp > hpMax)
-                {
-                    hp = hpMax;
-                }
-                cout << "Tu utilises " << item->getName()
-                     << " : +" << item->getValue() << " HP. (HP : "
-                     << hp << "/" << hpMax << ")" << endl;
+                newHP = getHPMax();
             }
+            setHP(newHP);
+            
+            cout << "Objet " << item->getName() << " utilise. HP: " << getHP() << endl;
 
             int newQty = item->getQuantity() - 1;
             if (newQty <= 0)
@@ -134,16 +99,37 @@ class Player : public Entity
         {
             if (inventory.empty())
             {
-                cout << "L'inventaire est vide." << endl;
+                cout << "Rien dans les poches." << endl;
                 return;
             }
             for (int i = 0; i < (int)inventory.size(); ++i)
             {
-                cout << i << ". " << inventory[i]->getName()
-                     << "  [" << inventory[i]->getType()
-                     << " +" << inventory[i]->getValue() << " HP]"
-                     << "  qty: " << inventory[i]->getQuantity() << endl;
+                cout << i << ". " << inventory[i]->getName() << " (x" << inventory[i]->getQuantity() << ")" << endl;
             }
+        }
+
+        void addKill(string cat)
+        {
+            monstersKilled++;
+            totalVictories++;
+            if (cat == "BOSS")
+            {
+                gainXP(5);
+            }
+            else if (cat == "MINIBOSS")
+            {
+                gainXP(3);
+            }
+            else
+            {
+                gainXP(2);
+            }
+        }
+
+        void addSpare()
+        {
+            monstersSpared++;
+            totalVictories++;
         }
 
         void addItem(Item* item)
@@ -163,33 +149,14 @@ class Player : public Entity
         {
             return totalVictories;
         }
-
-        void addKill(string category)
+        int getLevel()
         {
-            monstersKilled++;
-            totalVictories++;
-            
-            int xpGagne = 1;
-            if (category == "BOSS")
-            {
-                xpGagne = 5;
-            }
-            else if (category == "NORMAL")
-            {
-                xpGagne = 2;
-            }
-            else if (category == "MINIBOSS")
-            {
-                xpGagne = 3;
-            }
-            
-            gainXP(xpGagne);
+            return level;
         }
 
-        void addSpare()
+        void setlevel(int lvl)
         {
-            monstersSpared++;
-            totalVictories++;
-            gainXP(1);
+            level = lvl;
         }
+
 };

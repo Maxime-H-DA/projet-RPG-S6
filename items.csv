@@ -1,2 +1,2 @@
-mini_potion;HEAL;20;2
-super_potion;HEAL;50;1
+mini_potion;HEAL;50;5
+super_potion;HEAL;100;2

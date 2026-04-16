@@ -62,10 +62,12 @@ class Monster : public Entity
         {
             return mercyGauge;
         }
+
         int getMercyGoal()  
         {
             return mercyGoal;
         }
+
         vector<string> getActions()    
         {
             return availableActions;

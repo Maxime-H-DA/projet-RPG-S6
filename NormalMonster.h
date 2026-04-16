@@ -16,4 +16,14 @@ class NormalMonster : public Monster
         {
             return 2;
         }
+
+        void attack(Entity* target) override
+        {
+            int base = getAt() - target->getDe();
+            if (base < 1) base = 1;
+            uniform_int_distribution<int> dist(1, base);
+            int damage = dist(rng);
+            cout << getName() << " attaque pour " << damage << " degats !" << endl;
+            target->takeDamage(damage); 
+        }
 };

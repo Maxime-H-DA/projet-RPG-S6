@@ -9,7 +9,7 @@ static mt19937 rng(random_device{}());
 
 class Entity
 {
-    protected:
+    private:
         string name;
         int hpMax;
         int hp;
@@ -21,6 +21,8 @@ class Entity
 
         virtual string getCategory() const = 0;
 
+        virtual void attack(Entity* target) = 0;
+
         Entity(string pname, int phpmax, int pat, int pde)
         {
             name = pname;
@@ -30,20 +32,7 @@ class Entity
             de = pde;
         }
 
-        virtual void attack(Entity* target)
-        {
-            int base = at - target->getDe();
-            if (base < 1)
-            {
-                base = 1;
-            }
-            uniform_int_distribution<int> dist(base / 50, base / 10);
-            int damage = dist(rng);
-            cout << name << " attaque pour " << damage << " degats !" << endl;
-            target->takeDamage(damage);
-        }
-
-        virtual void takeDamage(int damage)
+        void takeDamage(int damage)
         {
             hp -= damage;
             if (hp < 0)
@@ -61,26 +50,47 @@ class Entity
         {
             return name;
         }
+
         int getHP()
         {
             return hp;
         }
+
         int getHPMax()
         {
             return hpMax;
         }
+
         int getAt()
         {
             return at;
         }
-        int getDe() 
-        { 
-            return de; 
+
+        int getDe()
+        {
+            return de;
         }
 
         void setHP(int hpValue)
         {
             hp = hpValue;
+            if (hp > hpMax)
+            {
+                hp = hpMax;
+            }
+        }
+
+        void setAt(int val)
+        {
+            at = val;
+        }
+        void setDe(int val)
+        {
+            de = val;
+        }
+        void setHPMax(int val)
+        {
+            hpMax = val;
             if (hp > hpMax)
             {
                 hp = hpMax;
