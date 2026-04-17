@@ -296,7 +296,7 @@ class GameManager
                 {
                     for (Monster* m : bestiary)
                     {
-                        if (m->getCategory() == "BOSS" && m->getMaxActions() == 4)
+                        if (m->getCategory() == "BOSS")
                         {
                             validMonsters.push_back(m);
                         }
@@ -307,15 +307,11 @@ class GameManager
                     for (Monster* m : bestiary) 
                     {
                         string cat = m->getCategory();
-                        int nb = m->getMaxActions();
-                        if (cat == "BOSS" && nb == 4)
+                        if (cat == "BOSS" && totalEncounters < 7)
                         {
                             continue;
                         }
-                        if (cat == "MINIBOSS" && totalEncounters <= 3 && nb == 3)
-                        {
-                            continue;
-                        }
+                        if (cat == "MINIBOSS" && totalEncounters < 3)
                         {
                             continue;
                         }
@@ -331,7 +327,7 @@ class GameManager
                 uniform_int_distribution<int> d(0, (int)validMonsters.size() - 1);
                 Monster* selected = validMonsters[d(rng)];
 
-                if (selected->getCategory() == "MINIBOSS" && selected->getMaxActions() == 3)
+                if (selected->getCategory() == "MINIBOSS")
                 {
                     lastMiniBossTurn = totalEncounters;
                 }
