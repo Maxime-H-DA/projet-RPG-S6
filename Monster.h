@@ -27,10 +27,7 @@ class Monster : public Entity
 
         virtual int getMaxActions() const = 0;
 
-        string getCategory() const override
-        {
-            return category;
-        }
+        virtual string getCategory() const = 0;
 
         void updateMercy(int amount)
         {

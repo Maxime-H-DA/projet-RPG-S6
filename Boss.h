@@ -12,6 +12,10 @@ class Boss : public Monster
         {
         }
 
+        string getCategory() const override
+        {
+            return "BOSS";
+        }
 
         int getMaxActions() const override
         {

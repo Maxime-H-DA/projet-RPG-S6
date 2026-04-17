@@ -19,8 +19,6 @@ class Entity
     public:
         virtual ~Entity() {}
 
-        virtual string getCategory() const = 0;
-
         virtual void attack(Entity* target) = 0;
 
         Entity(string pname, int phpmax, int pat, int pde)

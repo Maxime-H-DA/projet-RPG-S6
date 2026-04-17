@@ -12,6 +12,11 @@ class NormalMonster : public Monster
         {
         }
 
+        string getCategory() const override
+        {
+            return "NORMAL";
+        }
+
         int getMaxActions() const override
         {
             return 2;

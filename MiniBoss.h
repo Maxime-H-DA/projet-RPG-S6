@@ -12,6 +12,11 @@ class MiniBoss : public Monster
         {
         }
 
+        string getCategory() const override
+        {
+            return "MINIBOSS";
+        }
+
         int getMaxActions() const override
         {
             return 3;

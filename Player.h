@@ -36,11 +36,6 @@ class Player : public Entity
             inventory.clear();
         }
 
-        string getCategory() const override
-        {
-            return "PLAYER";
-        }
-
         void attack(Entity* target) override
         {
             int base = getAt() - target->getDe();
