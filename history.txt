@@ -1,11 +1,3 @@
 HISTORIQUE D'ALTERDUNE
-Pikachu [NORMAL] : Tue
-Reptincel [NORMAL] : Tue
 Maraiste [NORMAL] : Tue
-Givrali [NORMAL] : Tue
-Dracaufeu [MINIBOSS] : Tue
-Roucoops [NORMAL] : Tue
-Méganium [MINIBOSS] : Tue
-Kyogre [BOSS] : Tue
-Mewtwo [BOSS] : Tue
-Lugia [BOSS] : Tue
+Pyroli [NORMAL] : Tue

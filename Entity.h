@@ -15,7 +15,7 @@ class Entity
         int hp;
         int at;
         int de;
-
+ 
     public:
         virtual ~Entity() {}
 

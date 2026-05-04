@@ -182,7 +182,7 @@ class GameManager
                 else if (choice == 2)
                 {
                     vector<string> acts = enemy->getActions();
-                    for (int i = 0; i < (int)acts.size(); ++i)
+                    for (int i = 0; i < (int)acts.size(); i++)
                     {
                         cout << i << ". " << acts[i] << endl;
                     }
