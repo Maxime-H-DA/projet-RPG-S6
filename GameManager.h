@@ -62,6 +62,11 @@ class GameManager
             }
         }
 
+
+        /// @brief Charge l'inventaire initial du joueur depuis un fichier CSV (séparateur ;).
+        /// Format attendu : nom;type;valeur;quantite
+        /// Les lignes mal formées sont ignorées avec un message d'erreur.
+        /// @param filename Chemin vers le fichier items.csv
         void loadItems(string filename)
         {
             ifstream file(filename);
@@ -92,6 +97,12 @@ class GameManager
             }
         }
 
+
+        /// @brief Charge le bestiaire depuis un fichier CSV (séparateur ;).
+        /// Format : CATEGORIE;nom;hp;atk;def;mercyGoal;act1;act2[;act3][;act4]
+        /// Instancie NormalMonster, MiniBoss ou Boss selon la catégorie lue.
+        /// Les actions sont ajoutées via addAction() qui respecte la limite par catégorie.
+        /// @param filename Chemin vers le fichier monsters.csv
         void loadMonsters(string filename)
         {
             ifstream file(filename);
@@ -149,6 +160,11 @@ class GameManager
             }
         }
 
+
+        /// @brief Boucle principale d'un combat contre un monstre.
+        /// Tour joueur (FIGHT/ACT/ITEM/MERCY) puis tour monstre si encore en vie.
+        /// Le combat se termine par une mort ou un épargnement, les deux comptent comme victoire.
+        /// @param enemy Pointeur vers le monstre à affronter
         void startCombat(Monster* enemy)
         {
             cout << "\n--- Combat : " << enemy->getName() << " ---" << endl;
@@ -238,6 +254,10 @@ class GameManager
             }
         }
 
+
+        /// @brief Vérifie et affiche la fin de partie après 10 victoires.
+        /// Pacifiste si 0 kill, Génocidaire si 0 spare, Neutre sinon.
+        /// Déclenche aussi la sauvegarde de l'historique.
         void checkEnding()
         {
             cout << "\n--- DESTIN D'ALTERDUNE ---" << endl;
@@ -257,6 +277,10 @@ class GameManager
             gameRunning = false;
         }
 
+
+        /// @brief Sauvegarde le journal de partie dans history.txt.
+        /// Non demandé dans le sujet mais utile pour conserver une trace des choix du joueur
+        /// (tué ou épargné) et les présenter en soutenance comme preuve d'exécution.
         void saveHistory()
         {
             ofstream out("history.txt");
@@ -268,6 +292,10 @@ class GameManager
             out.close();
         }
 
+
+        /// @brief Boucle du menu principal. Gère la progression des rencontres :
+        /// les MINIBOSS n'apparaissent qu'après 3 combats, les BOSS qu'après 7 victoires.
+        /// Cette logique n'était pas dans le sujet mais évite qu'un joueur tombe sur un BOSS dès le départ.
         void mainMenu()
         {
             cout << "   DEBUT DE L'AVENTURE" << endl;

@@ -30,6 +30,8 @@ class Entity
             de = pde;
         }
 
+        /// @brief Réduit les HP de l'entité. Les HP ne peuvent pas descendre sous 0.
+        /// @param damage Quantité de dégâts à infliger
         void takeDamage(int damage)
         {
             hp -= damage;
@@ -39,6 +41,8 @@ class Entity
             }
         }
 
+        /// @brief Retourne vrai tant que les HP sont strictement positifs
+        /// @return 
         bool isAlive()
         {
             return hp > 0;
@@ -68,6 +72,9 @@ class Entity
         {
             return de;
         }
+
+        /// @brief Modifie les HP en les bornant à hpMax pour éviter toute surcharge
+        /// @param hpValue Nouvelle valeur de HP souhaitée
 
         void setHP(int hpValue)
         {

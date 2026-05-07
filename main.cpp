@@ -7,6 +7,10 @@
 
 using namespace std;
 
+/// @brief Tests automatiques lancés au démarrage avant le menu.
+/// Vérifie : réception de dégâts, système Mercy, level up.
+/// Le joueur est remis à son état initial après les tests.
+/// @param p Pointeur vers le joueur créé dans main()
 void runUnitTests(Player* p)
 {
     cout << "--- TESTS LOGIQUES ---" << endl;

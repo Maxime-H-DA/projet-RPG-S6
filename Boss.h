@@ -22,6 +22,11 @@ class Boss : public Monster
             return 4;
         }
 
+        /// @brief Attaque dévastatrice : fourchette (base*1.5, base*3).
+        /// Un BOSS fait toujours des dégâts significatifs, même au minimum.
+        /// Couplé aux 4 actions ACT disponibles, c'est le vrai défi final du jeu.
+        /// @param target Entité ciblée
+        
         void attack(Entity* target) override
         {
             int base = getAt() - target->getDe();

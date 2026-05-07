@@ -29,6 +29,11 @@ class Monster : public Entity
 
         virtual string getCategory() const = 0;
 
+
+        /// @brief Modifie la jauge Mercy et la borne entre 0 et mercyGoal.
+        /// Les impacts négatifs (INSULT, THREATEN) peuvent faire descendre la jauge,
+        /// ce qui force le joueur à réfléchir avant d'agir.
+        /// @param amount Delta à appliquer, positif ou négatif
         void updateMercy(int amount)
         {
             mercyGauge += amount;
@@ -42,11 +47,18 @@ class Monster : public Entity
             }
         }
 
+
+        /// @brief Retourne vrai si la jauge Mercy a atteint l'objectif.
+        /// C'est la seule condition pour que l'option MERCY soit utilisable en combat.
         bool isSpareable()
         {
             return mercyGauge >= mercyGoal;
         }
 
+
+        /// @brief Ajoute un identifiant d'action ACT au monstre, dans la limite de getMaxActions().
+        /// Un NORMAL ne peut jamais avoir plus de 2 actions même si le CSV en contient davantage.
+        /// @param actionID Identifiant de l'action (doit exister dans le catalogue du GameManager)
         void addAction(string actionID)
         {
             if ((int)availableActions.size() < getMaxActions())

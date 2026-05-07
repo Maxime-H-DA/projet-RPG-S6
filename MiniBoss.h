@@ -22,6 +22,11 @@ class MiniBoss : public Monster
             return 3;
         }
 
+
+        /// @brief Attaque modérée à élevée : fourchette (base/2, base*1.5).
+        /// Plus menaçant qu'un NORMAL mais pas encore écrasant. Le bas de la fourchette
+        /// permet des coups ratés ce qui rend les combats moins déterministes.
+        /// @param target Entité ciblée
         void attack(Entity* target) override
         {
             int base = getAt() - target->getDe();

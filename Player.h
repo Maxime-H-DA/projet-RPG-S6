@@ -36,6 +36,10 @@ class Player : public Entity
             inventory.clear();
         }
 
+        /// @brief Attaque d'un joueur. On s'éloigne ici de la formule du sujet (rand 0, HPmax cible)
+        /// pour une formule basée sur l'ATK et la DEF, plus équilibrée et logique en RPG.
+        /// La fourchette (base, base*2.5) donne des coups critiques tout en restant dans un écart raisonnable.
+        /// @param target Entité ciblée par l'attaque        
         void attack(Entity* target) override
         {
             int base = getAt() - target->getDe();
@@ -48,6 +52,11 @@ class Player : public Entity
             target->takeDamage(damage);
         }
 
+
+        /// @brief Gère la montée de niveau. Pas demandé dans le sujet mais ajouté pour
+        /// donner un sens à la progression : tuer un BOSS rapporte 5 XP, un MINIBOSS 3, un NORMAL 2.
+        /// Chaque niveau ajoute +5 ATK, +3 DEF et +20 HPmax, ce qui reste gérable face aux BOSS.
+        /// @param amount XP gagnée selon la catégorie du monstre vaincu
         void gainXP(int amount)
         {
             xp += amount;
@@ -64,6 +73,9 @@ class Player : public Entity
             }
         }
 
+        /// @brief Utilise un item de l'inventaire par son index. La quantité est décrémentée
+        /// et l'item supprimé quand elle atteint 0. Les HP sont bornés à hpMax.
+        /// @param index Position de l'item dans le vecteur inventory
         void useItem(int index)
         {
             if (index < 0 || index >= (int)inventory.size()) return;
@@ -103,6 +115,10 @@ class Player : public Entity
             }
         }
 
+        /// @brief Enregistre une victoire par élimination et attribue l'XP selon la catégorie.
+        /// Ce système de récompense différenciée n'était pas dans le sujet mais rend les BOSS
+        /// vraiment intéressants à affronter plutôt que de farmer les NORMAL.
+        /// @param cat Catégorie du monstre tué ("NORMAL", "MINIBOSS" ou "BOSS")
         void addKill(string cat)
         {
             monstersKilled++;
